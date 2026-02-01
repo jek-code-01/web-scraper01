@@ -14,17 +14,14 @@ public class MatchJsonParser {
     private static final List<String> SPORTS = List.of("Football", "Tennis", "Ice Hockey", "Basketball");
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final int MATCHES_PER_LEAGUE = 2;
-    //private static final Logger log = Logger.getLogger(MatchJsonParser.class.getName());
 
 
     private JsonNode mapStringtoJsonNode(String json) {
-        JsonNode root;
         try {
-            root = MAPPER.readTree(json);
+            return MAPPER.readTree(json);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("JSON input is incorrect", e);
         }
-        return root;
     }
 
 

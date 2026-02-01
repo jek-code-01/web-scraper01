@@ -12,8 +12,6 @@ import java.util.logging.Logger;
 
 public class DataRequester {
 
-
-    private static final Logger log = Logger.getLogger(DataRequester.class.getName());
     private final HttpClient client =  HttpClient.newHttpClient();
     private final String getTopLeaguesURL = "https://leonbets.com/api-2/betline/sports?ctag=en-US&flags=urlv2";
     private final String patternURLLeague = "https://leonbets.com/api-2/betline/changes/all?ctag=en-US&vtag=9c2cd386-31e1-4ce9-a140-28e9b63a9300&league_id={0}&hideClosed=true&flags=reg,urlv2,orn2,mm2,rrc,nodup";
@@ -21,6 +19,8 @@ public class DataRequester {
     private static final int TIMEOUT_MS = 5000;
     private static final int MAX_RETRIES = 3;
     private static final int RETRY_DELAY_MS = 1000;
+
+    private static final Logger log = Logger.getLogger(DataRequester.class.getName());
 
 
     public String getMatchJsonString(String matchId) {
@@ -38,13 +38,8 @@ public class DataRequester {
     }
 
     private String requestJson(String url) {
-        HttpRequest request = HttpRequest.newBuilder(URI.create(url))
-                .GET()
-                .timeout(Duration.ofMillis(TIMEOUT_MS))
-                .header("User-Agent", "Mozilla/5.0")
-                .header("Accept", "application/json")
-                .build();
 
+        HttpRequest request = buildHttpRequest(url);
         IOException lastException = null;
 
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -70,17 +65,29 @@ public class DataRequester {
                 throw new IllegalStateException("Thread interrupted during HTTP request", e);
             }
 
-            // Retry delay
-            if (attempt < MAX_RETRIES) {
-                try {
-                    Thread.sleep(RETRY_DELAY_MS);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new IllegalStateException("Interrupted during retry delay", e);
-                }
-            }
-        }
 
+            if (attempt < MAX_RETRIES)
+                retryDelay();
+
+        }
         throw new IllegalStateException("Failed to fetch URL after " + MAX_RETRIES + " attempts: " + url, lastException);
+    }
+
+    private HttpRequest buildHttpRequest(String url) {
+        return HttpRequest.newBuilder(URI.create(url))
+                .GET()
+                .timeout(Duration.ofMillis(TIMEOUT_MS))
+                .header("User-Agent", "Mozilla/5.0")
+                .header("Accept", "application/json")
+                .build();
+    }
+
+    private void retryDelay() {
+        try {
+            Thread.sleep(RETRY_DELAY_MS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted during retry delay", e);
+        }
     }
 }
