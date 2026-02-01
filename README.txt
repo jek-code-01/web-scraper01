@@ -2,6 +2,7 @@ Data Parser Java
 
 This is a Java application that retrieves prematch sports data using backend JSON endpoints only (no browser, no Selenium, no HTML scraping).
 The program runs asynchronous requests (max 3 threads) and prints structured match, market, and odds data to the console.
+Be careful, as the input could be pretty huge (~70k lines) so consider sending it to a file from the start.
 
 
 WHAT THIS PROGRAM DOES
@@ -39,7 +40,7 @@ STEP 1 — Install Java (REQUIRED)
 Check if Java exists:
     java -version
 
-If you see version 17 or higher, continue.
+If you see version 21 or higher, continue.
 
 If not installed:
 1. Go to https://adoptium.net/

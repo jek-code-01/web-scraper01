@@ -44,15 +44,13 @@ public class DataRequester {
 
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
-                log.info("Requesting URL (attempt " + attempt + "/" + MAX_RETRIES + "): " + url);
 
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
                 int status = response.statusCode();
 
-                if (status >= 200 && status < 300) {
-                    log.info("Request successful: " + url + " (status " + status + ")");
+                if (status >= 200 && status < 300)
                     return response.body();
-                }
+
 
                 log.warning("Non-success status " + status + " for " + url + " (attempt " + attempt + "/" + MAX_RETRIES + ")");
 
